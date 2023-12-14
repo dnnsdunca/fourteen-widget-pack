@@ -1,0 +1,47 @@
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.os.Handler
+import android.util.AttributeSet
+import android.view.View
+import java.text.SimpleDateFormat
+import java.util.*
+
+class ClockView @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
+
+    private val paint = Paint().apply {
+        color = 0xFF000000.toInt() // Black color
+        textSize = 60f // Text size
+        isAntiAlias = true
+    }
+
+    private val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    private val handler = Handler()
+    private val updateTimeRunnable = object : Runnable {
+        override fun run() {
+            invalidate() // Redraw the view
+            handler.postDelayed(this, 1000) // Schedule next update after 1 second
+        }
+    }
+
+    init {
+        handler.post(updateTimeRunnable)
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        val currentTime = timeFormat.format(Date())
+        canvas.drawText(currentTime, 50f, 100f, paint) // Draw the time
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        handler.removeCallbacks(updateTimeRunnable) // Remove callbacks when the view is detached
+    }
+}
+<com.yourpackage.ClockView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/clockView"/>
